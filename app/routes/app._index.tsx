@@ -1,41 +1,68 @@
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
 import {
   Page,
   Layout,
-  Text,
   Card,
   BlockStack,
+  EmptyState
 } from "@shopify/polaris";
+import { TitleBar } from "@shopify/app-bridge-react";
+
 import { authenticate } from "../shopify.server";
+import db from "../db.server";
+import { ConnectionsLayout } from "../components";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  await authenticate.admin(request);
+  const { session } = await authenticate.admin(request);
+  const { shop } = session;
+  const connections = await db.connection.findMany({
+    where: {
+      shop,
+    },
+  });
 
-  return null;
-};
-
-export const action = async ({ request }: ActionFunctionArgs) => {
-  const { admin } = await authenticate.admin(request);
-
-  return json({});
+   return json({ connections });
 };
 
 export default function Index() {
+  const { connections } = useLoaderData<typeof loader>() || {};
+
+  const EmptyStateExample = () => {
+    return (
+      <Card>
+        <EmptyState
+          heading="No connections found"
+          action={{
+            content: 'Add connection', 
+            url: '/app/connection/new'
+          }}
+          secondaryAction={{
+            content: 'Learn more',
+            url: 'https://help.shopify.com',
+          }}
+          image="https://cdn.shopify.com/s/files/1/0262/4071/2726/files/emptystate-files.png"
+        >
+          <p>Add a connection to start migrating your products.</p>
+        </EmptyState>
+      </Card>
+    );
+  }
+
   return (
     <Page>
       <BlockStack gap="500">
         <Layout>
+          <TitleBar
+            title="Duilo Migration Tool"
+          />
           <Layout.Section>
-            <Card>
-              <BlockStack gap="500">
-                <BlockStack gap="200">
-                  <Text as="h2" variant="headingMd">
-                    Duilo Migration Tool
-                  </Text>
-                </BlockStack>
-              </BlockStack>
-            </Card>
+            {connections.length === 0 
+              ? <EmptyStateExample /> 
+              : <ConnectionsLayout connections={
+                connections.map(connection => ({...connection, id: connection.id.toString()}))} />
+            }
           </Layout.Section>
         </Layout>
       </BlockStack>
