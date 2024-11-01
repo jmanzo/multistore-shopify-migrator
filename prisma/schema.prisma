@@ -39,6 +39,33 @@ model Connection {
   apiKey    String
 }
 
+model Menu {
+  id          Int      @id @default(autoincrement())
+  shopifyId   String
+  handle      String
+  title       String
+  items       MenuItem[]
+}
+
+model MenuItem {
+  id          Int      @id @default(autoincrement())
+  position    Int
+  title       String
+  handle      String
+  type        String
+  url         String
+  menuId      Int
+  menu        Menu     @relation(fields: [menuId], references: [id])
+  tags        Tag[]
+}
+
+model Tag {
+  id          Int      @id @default(autoincrement())
+  name        String
+  menuItemId  Int
+  menuItem    MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+}
+
 model Product {
   id          Int      @id @default(autoincrement())
   shopifyId   String
