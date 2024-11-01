@@ -1,10 +1,39 @@
-# Shopify App Template - Remix
+# Shopify Multi-Store Sync App
 
-This is a template for building a [Shopify app](https://shopify.dev/docs/apps/getting-started) using the [Remix](https://remix.run) framework.
+This app enables seamless data synchronization across multiple Shopify stores, built using the [Remix](https://remix.run) framework.
 
-Rather than cloning this repo, you can use your preferred package manager and the Shopify CLI with [these steps](https://shopify.dev/docs/apps/getting-started/create).
+## PS: This is a work in progress (WIP). 
 
-Visit the [`shopify.dev` documentation](https://shopify.dev/docs/api/shopify-app-remix) for more details on the Remix app package.
+## Purpose
+
+This app was developed to solve a common challenge in multi-store Shopify management: maintaining consistent data across multiple stores belonging to the same client or employer. It eliminates the manual work and potential errors involved in:
+
+- Updating product information across multiple stores (WIP)
+- Maintaining consistent customer data (WIP)
+- Syncing order histories for consolidated reporting (WIP)
+- Keeping navigation menus aligned across stores
+- Managing both one-time migrations and ongoing synchronization needs (WIP)
+
+## Key Features
+
+### Comprehensive Data Synchronization (WIP)
+- Products (including variants, images, and metadata)
+- Customers and their historical data
+- Order histories
+- Online store navigation menus
+- Custom collections and smart collections
+
+### Flexible Sync Architecture
+- Primary store to multiple secondary stores synchronization
+- Support for both one-time migrations and continuous sync
+- Configurable sync rules per store connection
+- Real-time updates using Shopify webhooks (WIP)
+
+### Connection Management
+- Easy setup of new store connections
+- Granular control over which data types sync to each connected store (WIP)
+- Connection health monitoring (WIP)
+- Sync history and audit logs (WIP)
 
 ## Quick start
 
@@ -361,3 +390,26 @@ This template uses [Remix](https://remix.run). The following Shopify tools are a
 - [App extensions](https://shopify.dev/docs/apps/app-extensions/list)
 - [Shopify Functions](https://shopify.dev/docs/api/functions)
 - [Getting started with internationalizing your app](https://shopify.dev/docs/apps/best-practices/internationalization/getting-started)
+
+## Performance Considerations
+
+### Data Volume Management
+- Batch processing for large data sets
+- Rate limiting compliance with Shopify API
+- Efficient data diffing to minimize API calls
+- Background job processing for heavy sync operations
+
+### Sync Strategies
+- Initial bulk sync for new store connections
+- Incremental updates for ongoing synchronization
+- Priority queuing for critical updates
+- Conflict resolution handling
+
+## Database Schema
+
+The app uses Prisma with the following key models (in addition to the session storage):
+
+- StoreConnections: Manages relationships between primary and secondary stores
+- SyncConfigs: Stores sync preferences per connection
+- SyncHistory: Tracks all sync operations and their results
+- DataMappings: Maintains relationships between objects across stores
