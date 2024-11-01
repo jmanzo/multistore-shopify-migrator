@@ -1,11 +1,13 @@
 import { json, redirect } from "@remix-run/node";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { Form, useLoaderData, useNavigation, useSubmit } from "@remix-run/react";
-import { Card, Layout, Page, PageActions, TextField } from "@shopify/polaris";
+import { Button, Card, Layout, Page, PageActions, TextField } from "@shopify/polaris";
+import { useNavigate } from '@remix-run/react';
 
 import { authenticate } from "app/shopify.server";
 import db from "../db.server";
 import { useState } from "react";
+import { TitleBar } from "@shopify/app-bridge-react";
 
 type Connection = {
     id: number | string;
@@ -81,6 +83,7 @@ export default function Connection() {
         JSON.stringify(connection) !== JSON.stringify(cleanFormState);
     const nav = useNavigation();
     const submit = useSubmit();
+    const navigate = useNavigate();
 
     const isSaving = nav?.state === "submitting" && nav.formData?.get("action") !== "delete";
     const isDeleting = nav?.state === "submitting" && nav.formData?.get("action") === "delete";
@@ -97,7 +100,14 @@ export default function Connection() {
     }
 
     return (
-        <Page>
+        <Page primaryAction={
+            <Button
+                onClick={() => navigate("/app/export")}  
+            >Sync</Button>
+        }>
+            <TitleBar
+                title="Duilo Migration Tool"
+            />
             <Layout>
                 <Layout.Section>
                     <Card>

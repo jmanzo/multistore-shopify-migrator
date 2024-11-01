@@ -45,13 +45,14 @@ model Menu {
   handle      String
   title       String
   items       MenuItem[]
+
+  @@unique([shopifyId, handle])
 }
 
 model MenuItem {
   id          Int      @id @default(autoincrement())
   position    Int
   title       String
-  handle      String
   type        String
   url         String
   menuId      Int
@@ -64,6 +65,8 @@ model Tag {
   name        String
   menuItemId  Int
   menuItem    MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+
+  @@unique([name, menuItemId])
 }
 
 model Product {
