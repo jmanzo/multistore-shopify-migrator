@@ -51,7 +51,19 @@ export default function Index() {
   }
 
   return (
-    <Page>
+    <Page
+      primaryAction={{
+        content: 'Create Connection',
+        url: '/app/connection/new',
+      }}
+      actionGroups={[{
+        title: 'Actions',
+        actions: [{
+          content: 'Sync Menu',
+          url: '/app/menu-sync',
+        }]
+      }]}
+    >
       <BlockStack gap="500">
         <Layout>
           <TitleBar

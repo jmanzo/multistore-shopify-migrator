@@ -1,13 +1,12 @@
 import { json, redirect } from "@remix-run/node";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { Form, useLoaderData, useNavigation, useSubmit } from "@remix-run/react";
-import { Button, Card, Layout, Page, PageActions, TextField } from "@shopify/polaris";
+import { Breadcrumbs, Card, Layout, Page, PageActions, TextField } from "@shopify/polaris";
 import { useNavigate } from '@remix-run/react';
 
 import { authenticate } from "app/shopify.server";
 import db from "../db.server";
 import { useState } from "react";
-import { TitleBar } from "@shopify/app-bridge-react";
 
 type Connection = {
     id: number | string;
@@ -44,7 +43,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
 };
 
 export async function action({ request, params }: ActionFunctionArgs) {
-    const { session, admin } = await authenticate.admin(request);
+    const { session } = await authenticate.admin(request);
     const { shop } = session;
     const data = {
         ...Object.fromEntries(await request.formData())
@@ -103,13 +102,14 @@ export default function Connection() {
     }
 
     return (
-        <Page primaryAction={
-            <Button
-                onClick={() => navigate("/app/menu-sync")}  
-            >Sync</Button>
-        }>
-            <TitleBar
-                title="Duilo Migration Tool"
+        <Page
+            title="Duilo Migration Tool"
+        >
+            <Breadcrumbs
+                backAction={{
+                    content: 'Connections',
+                    onAction: () => navigate('/app'),
+                }}
             />
             <Layout>
                 <Layout.Section>
