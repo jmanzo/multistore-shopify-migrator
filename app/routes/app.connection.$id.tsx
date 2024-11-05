@@ -14,7 +14,8 @@ type Connection = {
     shop: string;
     storeName: string;
     apiKey: string;
-    apiSecret: string;
+    accessToken: string;
+    url: string;
 };
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
@@ -28,7 +29,8 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
             shop,
             storeName: '',
             apiKey: '',
-            apiSecret: '',
+            accessToken: '',
+            url: '',
         } as Connection);
     }
 
@@ -54,7 +56,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
                 shop,
                 storeName: connectionData.storeName,
                 apiKey: connectionData.apiKey,
-                apiSecret: connectionData.apiSecret,
+                accessToken: connectionData.accessToken,
+                url: connectionData.url,
             }
         })
         : await db.connection.update({ 
@@ -102,7 +105,7 @@ export default function Connection() {
     return (
         <Page primaryAction={
             <Button
-                onClick={() => navigate("/app/export")}  
+                onClick={() => navigate("/app/menu-sync")}  
             >Sync</Button>
         }>
             <TitleBar
@@ -125,10 +128,17 @@ export default function Connection() {
                                 onChange={(value) => setConnection({ ...connection, apiKey: value })}
                             />
                             <TextField
-                                label="API Secret"
-                                value={connection?.apiSecret || ''}
+                                label="Access Token"
+                                value={connection?.accessToken || ''}
                                 autoComplete="off"
-                                onChange={(value) => setConnection({ ...connection, apiSecret: value })}
+                                onChange={(value) => setConnection({ ...connection, accessToken: value })}
+                            />
+                            <TextField
+                                label="Shopify URL"
+                                value={connection?.url || ''}
+                                autoComplete="off"
+                                onChange={(value) => setConnection({ ...connection, url: value })}
+                                placeholder="https://store-name.myshopify.com"
                             />
                         </Form>
                     </Card>

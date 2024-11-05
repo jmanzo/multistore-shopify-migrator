@@ -3,5 +3,6 @@ export interface Connection {
     shop: string;
     storeName: string;
     apiKey: string;
-    apiSecret: string;
+    accessToken: string;
+    url: string;
 };

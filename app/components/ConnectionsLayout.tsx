@@ -1,64 +1,29 @@
 import {
-    IndexTable,
     Card,
-    useIndexResourceState,
-    Text,
+    DataTable,
 } from '@shopify/polaris';
 import { Link } from '@remix-run/react';
 
 import type { Connection } from '../types';
   
 const ConnectionsLayout = ({ connections }: { connections: Connection[] }) => {
-    const resourceName = {
-      singular: 'connection',
-      plural: 'connections',
-    };
-    const {selectedResources, allResourcesSelected, handleSelectionChange} =
-      useIndexResourceState(connections.map(connection => ({...connection, id: connection.id.toString()})));
-  
-    const rowMarkup = connections.map(
-      (
-        {id, storeName, apiKey},
-        index,
-      ) => (
-        <IndexTable.Row
-          id={id.toString()}
-          key={id.toString()}
-          selected={selectedResources.includes(id.toString())}
-          position={index}
-        >
-          <IndexTable.Cell>
-            <Text variant="bodyMd" fontWeight="bold" as="span">
-                <Link to={`connection/${id}`}>
-                    {storeName}
-                </Link>
-            </Text>
-          </IndexTable.Cell>
-          <IndexTable.Cell>
-            <Text as="span" alignment="end" numeric>
-              {apiKey}
-            </Text>
-          </IndexTable.Cell>
-        </IndexTable.Row>
-      ),
+    const rows = connections.map(
+      ({id, storeName, apiKey}) => ([
+        <Link to={`connection/${id}`}>{storeName}</Link>,
+        apiKey,
+      ]),
     );
   
     return (
       <Card>
-        <IndexTable
-          resourceName={resourceName}
-          itemCount={connections.length}
-          selectedItemsCount={
-              allResourcesSelected ? 'All' : selectedResources.length
-          }
-          onSelectionChange={handleSelectionChange}
+        <DataTable
+          columnContentTypes={['text', 'text']}
           headings={[
-            {title: 'Store name'},
-            {title: 'API key', alignment: 'end'},
+            'Store name',
+            'API key',
           ]}
-        >
-          {rowMarkup}
-        </IndexTable>
+          rows={rows}
+        />
       </Card>
     );
   }

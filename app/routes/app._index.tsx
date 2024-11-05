@@ -61,7 +61,11 @@ export default function Index() {
             {connections.length === 0 
               ? <EmptyStateExample /> 
               : <ConnectionsLayout connections={
-                connections.map(connection => ({...connection, id: connection.id.toString()}))} />
+                connections.map(connection => ({
+                  ...connection, 
+                  id: connection.id.toString(), 
+                  apiKey: connection.apiKey
+                }))} />
             }
           </Layout.Section>
         </Layout>

@@ -32,11 +32,12 @@ model Session {
 }
 
 model Connection {
-  id        Int     @id @default(autoincrement())
-  shop      String
-  storeName String
-  apiSecret String
-  apiKey    String
+  id          Int     @id @default(autoincrement())
+  shop        String
+  storeName   String
+  accessToken String
+  apiKey      String
+  url         String
 }
 
 model Menu {
