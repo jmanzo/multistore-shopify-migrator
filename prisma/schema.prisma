@@ -9,8 +9,8 @@ generator client {
 // enough when changing adapters.
 // See https://www.prisma.io/docs/orm/reference/prisma-schema-reference#string for more information
 datasource db {
-  provider = "sqlite"
-  url      = "file:dev.sqlite"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Session {
@@ -52,12 +52,12 @@ model Menu {
 
 model MenuItem {
   id          Int      @id @default(autoincrement())
-  position    Int
+  parentId    Int
   title       String
   type        String
   url         String
   menuId      Int
-  menu        Menu     @relation(fields: [menuId], references: [id])
+  menu        Menu     @relation(fields: [menuId], references: [id], onDelete: Cascade)
   tags        Tag[]
 }
 
