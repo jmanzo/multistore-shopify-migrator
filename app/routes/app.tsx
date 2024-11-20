@@ -28,8 +28,8 @@ export default function App() {
         <Link to="/app/connections">
           Connections
         </Link>
-        <Link to="/app/data">
-          Data
+        <Link to="/app/settings">
+          Settings
         </Link>
       </NavMenu>
       <Outlet />
