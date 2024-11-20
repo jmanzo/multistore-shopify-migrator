@@ -70,50 +70,62 @@ model Tag {
   @@unique([name, menuItemId])
 }
 
-model Product {
-  id          Int      @id @default(autoincrement())
-  shopifyId   String
-  title       String
-  handle      String
-  bodyHtml    String
-  vendor      String
-  createdAt   DateTime
-  updatedAt   DateTime
-  variants    Variant[]
-  collections Collection[]
-  metafields  Metafield[]
-}
+// model Product {
+//   id          Int      @id @default(autoincrement())
+//   shopifyId   String
+//   title       String
+//   handle      String
+//   bodyHtml    String
+//   vendor      String
+//   createdAt   DateTime
+//   updatedAt   DateTime
+//   variants    Variant[]
+//   collections Collection[]
+//   metafields  Metafield[]
+// }
 
-model Variant {
-  id          Int      @id @default(autoincrement())
-  shopifyId   String
-  title       String
-  price       Float    
-  sku         String
-  product     Product  @relation(fields: [productId], references: [id])
-  productId   Int
-}
+// model Variant {
+//   id          Int      @id @default(autoincrement())
+//   shopifyId   String
+//   title       String
+//   price       Float    
+//   sku         String
+//   product     Product  @relation(fields: [productId], references: [id])
+//   productId   Int
+// }
 
-model Collection {
-  id          Int      @id @default(autoincrement())
-  shopifyId   String
-  title       String
-  handle      String
-  products    Product[]
-  metafields  Metafield[]
-}
+// model Collection {
+//   id          Int      @id @default(autoincrement())
+//   shopifyId   String
+//   title       String
+//   handle      String
+//   products    Product[]
+//   metafields  Metafield[]
+// }
 
-model Metafield {
-  id            Int      @id @default(autoincrement())
-  productId     Int
-  collectionId  Int
-  shopifyId     String
-  namespace     String
-  key           String
-  value         String
-  valueType     String
-  ownerType     String
-  ownerId       String
-  product       Product? @relation(fields: [productId], references: [id])
-  collection    Collection? @relation(fields: [collectionId], references: [id])
+// model Metafield {
+//   id            Int      @id @default(autoincrement())
+//   productId     Int
+//   collectionId  Int
+//   shopifyId     String
+//   namespace     String
+//   key           String
+//   value         String
+//   valueType     String
+//   ownerType     String
+//   ownerId       String
+//   product       Product? @relation(fields: [productId], references: [id])
+//   collection    Collection? @relation(fields: [collectionId], references: [id])
+// }
+
+// /* ============================== */
+// /* Settings
+// /* ============================== */
+
+model Setting {
+  id          Int      @id @default(autoincrement())
+  shop        String   @unique
+  products    Boolean  @default(false)
+  collections Boolean  @default(false)
+  navigations Boolean  @default(false)
 }
