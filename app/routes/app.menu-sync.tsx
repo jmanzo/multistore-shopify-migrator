@@ -1,4 +1,4 @@
-// app/routes/export.js
+// app/routes/app.menu-sync.tsx
 import { json, LoaderFunction } from '@remix-run/node';
 
 import db from '../db.server';
