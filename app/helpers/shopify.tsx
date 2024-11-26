@@ -17,15 +17,16 @@ export const updateShopifyCollection = async (
       ...payload,
       rules: await Promise.all((payload.rules || []).map(async rule => {
         const metafieldId = rule?.condition_object_id;
+        const categoryId = rule?.column === "product_category_id"
+          ? `gid://shopify/TaxonomyCategory/${rule?.condition}`
+          : null;
         const metafieldResponse = metafieldId ? await getMetafield(admin, metafieldId) : null;
         const metafieldDefinition = metafieldResponse ? metafieldResponse?.data?.metafieldDefinition : null;
         const metafieldFromConnection = metafieldDefinition 
           ? await getMetafieldsFromConnection(connection, metafieldDefinition) : null;
         return {
           ...rule,
-          condition_object_id: metafieldFromConnection 
-            ? metafieldFromConnection.id
-            : undefined,
+          condition_object_id: metafieldFromConnection?.id || categoryId || undefined,
         };
       })),
     }
@@ -334,7 +335,7 @@ const createShopifyCollectionFromConnection = async (
   try {
     const operation = `
       #graphql
-      mutation createCollectionMetafields($input: CollectionInput!) {
+      mutation CollectionCreate($input: CollectionInput!) {
         collectionCreate(input: $input) {
           collection {
             handle
@@ -369,13 +370,14 @@ const createShopifyCollectionFromConnection = async (
                   column: rule?.column.toUpperCase(),
                   condition: rule?.condition,
                   relation: rule?.relation.toUpperCase(),
-                  conditionObjectId: (rule.column === "product_metafield_definition" && rule.condition_object_id)
-                    ? rule.condition_object_id
-                    : undefined,
+                  conditionObjectId: rule?.condition_object_id || undefined,
                 })),
               },
-              // image: payload?.image,
-              // seo: payload?.seo,
+              image: {
+                altText: payload?.image?.alt,
+                src: payload?.image?.src
+              },
+              seo: payload?.seo,
               sortOrder: payload?.sort_order.toUpperCase().replace('-', '_'),
             },
           },
@@ -435,12 +437,13 @@ const updateShopifyCollectionFromConnection = async (
                   column: rule.column.toUpperCase(),
                   condition: rule.condition,
                   relation: rule.relation.toUpperCase(),
-                  conditionObjectId: (rule.column === "product_metafield_definition" && rule.condition_object_id)
-                    ? rule.condition_object_id
-                    : undefined,
+                  conditionObjectId: rule?.condition_object_id || undefined,
                 })),
               },
-              image: payload.image,
+              image: {
+                altText: payload?.image?.alt,
+                src: payload?.image?.src
+              },
               seo: payload.seo,
               sortOrder: payload.sort_order.toUpperCase().replace('-', '_'),
             },

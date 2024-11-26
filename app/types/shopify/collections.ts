@@ -6,7 +6,7 @@ export interface CollectionPayload {
     sort_order:             string;
     disjunctive?:           boolean;
     rules?:                 RulePayload[];
-    image?:                 string;
+    image?:                 ImagePayload;
     seo?:                   string;
     fromConnectionId?:      string;
 }
@@ -16,4 +16,9 @@ export interface RulePayload {
     condition:              string;
     condition_object_id?:   string;
     relation:               string;
+}
+
+export interface ImagePayload {
+    src: string;
+    alt?: string;
 }
