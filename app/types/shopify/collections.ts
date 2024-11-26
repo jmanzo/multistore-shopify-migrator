@@ -2,14 +2,14 @@ export interface CollectionPayload {
     handle: string;
     title: string;
     body_html: string;
-    sortOrder: string;
+    sort_order: string;
     disjunctive?: boolean;
     rules?: RulePayload[];
 }
 
 export interface RulePayload {
-    column:          string;
-    condition:       string;
-    condition_object_id: string;
-    relation:        string;
+    column:                 string;
+    condition:              string;
+    condition_object_id?:   string;
+    relation:               string;
 }
