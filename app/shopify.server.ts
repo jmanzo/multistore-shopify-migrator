@@ -24,6 +24,14 @@ const shopify = shopifyApp({
       deliveryMethod: DeliveryMethod.Http,
       callbackUrl: "/webhooks/app/collection",
     },
+    COLLECTIONS_UPDATE: {
+      deliveryMethod: DeliveryMethod.Http,
+      callbackUrl: "/webhooks/app/collection",
+    },
+    COLLECTIONS_DELETE: {
+      deliveryMethod: DeliveryMethod.Http,
+      callbackUrl: "/webhooks/app/collection",
+    },
   },
   hooks: {
     afterAuth: async ({ session }) => {

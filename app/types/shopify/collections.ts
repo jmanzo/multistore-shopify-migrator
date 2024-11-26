@@ -1,10 +1,14 @@
 export interface CollectionPayload {
-    handle: string;
-    title: string;
-    body_html: string;
-    sort_order: string;
-    disjunctive?: boolean;
-    rules?: RulePayload[];
+    admin_graphql_api_id?:  string;
+    handle:                 string;
+    title:                  string;
+    body_html:              string;
+    sort_order:             string;
+    disjunctive?:           boolean;
+    rules?:                 RulePayload[];
+    image?:                 string;
+    seo?:                   string;
+    fromConnectionId?:      string;
 }
 
 export interface RulePayload {

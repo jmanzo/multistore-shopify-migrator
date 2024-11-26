@@ -5,7 +5,7 @@ import type { Connection } from "../server/collections";
 import { CollectionPayload } from "../types/shopify/collections";
 import { MetafieldDefinition, MetafieldsByDefinitionResponse, Type, Validation } from "../types/shopify/metafields";
 
-export const createShopifyCollection = async (
+export const updateShopifyCollection = async (
   admin: AdminApiContext, 
   connections: Connection[], 
   payload: CollectionPayload
@@ -18,11 +18,12 @@ export const createShopifyCollection = async (
       rules: await Promise.all((payload.rules || []).map(async rule => {
         const metafieldId = rule?.condition_object_id;
         const metafieldResponse = metafieldId ? await getMetafield(admin, metafieldId) : null;
-        const metafieldDefinition = metafieldResponse?.data?.metafieldDefinition;
-        const metafieldFromConnection = await getMetafieldsFromConnection(connection, metafieldDefinition);
+        const metafieldDefinition = metafieldResponse ? metafieldResponse?.data?.metafieldDefinition : null;
+        const metafieldFromConnection = metafieldDefinition 
+          ? await getMetafieldsFromConnection(connection, metafieldDefinition) : null;
         return {
           ...rule,
-          condition_object_id: metafieldDefinition 
+          condition_object_id: metafieldFromConnection 
             ? metafieldFromConnection.id
             : undefined,
         };
@@ -41,7 +42,12 @@ export const createShopifyCollection = async (
         formattedPayload
       );
     } else {
-      console.info("--- Collection found in connection: ", connection.shop);
+      console.info("--- Collection found in connection: ", connection.url);
+      await updateShopifyCollectionFromConnection(
+        connection, 
+        { ...formattedPayload,
+          fromConnectionId: collectionFromConnection.id }
+      );
     }
   }
 };
@@ -383,5 +389,71 @@ const createShopifyCollectionFromConnection = async (
     console.warn('! userErrors: ', data?.data?.collectionCreate?.userErrors);
   } catch (error) {
     console.error("x Error creating collection in connection: ", error);
+  }
+}
+
+const updateShopifyCollectionFromConnection = async (
+  connection: Connection, 
+  payload: CollectionPayload
+) => {
+  try {
+    const operation = `
+      #graphql
+      mutation updateCollection($input: CollectionInput!) {
+        collectionUpdate(input: $input) {
+          collection {
+            handle
+            title
+          }
+          userErrors {
+            message
+            field
+          }
+        }
+      }
+    `;
+
+    const response = await fetch(
+      connection.url + '/admin/api/2024-10/graphql.json', 
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Shopify-Access-Token': connection.accessToken,
+        },
+        body: JSON.stringify({
+          query: operation,
+          variables: {
+            input: {
+              id: payload.fromConnectionId,
+              descriptionHtml: payload.body_html,
+              handle: payload.handle,
+              title: payload.title,
+              ruleSet: {
+                appliedDisjunctively: payload.disjunctive,
+                rules: payload.rules?.map(rule => ({
+                  column: rule.column.toUpperCase(),
+                  condition: rule.condition,
+                  relation: rule.relation.toUpperCase(),
+                  conditionObjectId: (rule.column === "product_metafield_definition" && rule.condition_object_id)
+                    ? rule.condition_object_id
+                    : undefined,
+                })),
+              },
+              image: payload.image,
+              seo: payload.seo,
+              sortOrder: payload.sort_order.toUpperCase().replace('-', '_'),
+            },
+          },
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    console.info('--- collection: ', data?.data?.collectionUpdate?.collection);
+    console.warn('! userErrors: ', data?.data?.collectionUpdate?.userErrors);
+  } catch (error) {
+    console.error("x Error updating collection in connection: ", error);
   }
 }

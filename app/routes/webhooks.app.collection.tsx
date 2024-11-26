@@ -3,7 +3,7 @@ import type { AdminApiContext } from "@shopify/shopify-app-remix/server";
 
 import { authenticate } from "../shopify.server";
 import { CollectionPayload } from "../types/shopify/collections";
-import { createCollection } from "../server/collections";
+import { updateCollection } from "../server/collections";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { shop, topic, payload, admin } = await authenticate.webhook(request);
@@ -11,9 +11,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   console.log(`--- Received ${topic} webhook for ${shop} ---`);
 
   switch (topic) {
-    case "COLLECTIONS_CREATE":
-      console.log("--- Collection created ---");
-      await createCollection(admin as AdminApiContext, shop, payload as CollectionPayload);
+    case "COLLECTIONS_DELETE":
+      console.log("--- Collection Deleted ---");
+      break;
+    default:
+      console.info("--- Collection Updated ---");
+      await updateCollection(admin as AdminApiContext, shop, payload as CollectionPayload);
       break;
   }
 

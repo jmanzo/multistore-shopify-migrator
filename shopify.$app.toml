@@ -31,7 +31,7 @@ api_version = "2024-10"
   uri = "/webhooks/app/uninstalled"
   
   [[webhooks.subscriptions]]
-  topics = [ "collections/create" ]
+  topics = [ "collections/create", "collections/update", "collections/delete" ]
   uri = "/webhooks/app/collection"
 
 [pos]

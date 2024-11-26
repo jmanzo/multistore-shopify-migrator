@@ -1,7 +1,7 @@
 import type { AdminApiContext } from "@shopify/shopify-app-remix/server";
 
 import db from "../db.server";
-import { createShopifyCollection } from "../helpers/shopify";
+import { updateShopifyCollection } from "../helpers/shopify";
 import { CollectionPayload } from "app/types/shopify";
 
 export type Collection = {
@@ -26,7 +26,7 @@ export type Connection = {
   url: string;
 };
 
-export const createCollection = async (admin: AdminApiContext, shop: string, payload: CollectionPayload) => {
+export const updateCollection = async (admin: AdminApiContext, shop: string, payload: CollectionPayload) => {
     const settings = await db.setting.findUnique({
         where: { shop },
     });
@@ -42,5 +42,5 @@ export const createCollection = async (admin: AdminApiContext, shop: string, pay
         return;
     }
 
-    return await createShopifyCollection(admin, connections, payload);
+    return await updateShopifyCollection(admin, connections, payload);
 };
