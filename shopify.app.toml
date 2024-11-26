@@ -3,7 +3,7 @@
 client_id = "e91f881d7a3e44b9c705661c7aca9284"
 name = "duilo-migration-app"
 handle = "duilo-migration-app"
-application_url = "https://example.com/"
+application_url = "https://toe-satisfaction-resorts-maintained.trycloudflare.com"
 embedded = true
 
 [build]
@@ -16,7 +16,36 @@ include_config_on_deploy = true
 scopes = "read_online_store_navigation,write_products"
 
 [auth]
-redirect_urls = [ "https://example.com/api/auth" ]
+redirect_urls = [
+  "https://example.com/api/auth",
+  "https://incl-instructors-resolved-feed.trycloudflare.com/auth/callback",
+  "https://incl-instructors-resolved-feed.trycloudflare.com/auth/shopify/callback",
+  "https://incl-instructors-resolved-feed.trycloudflare.com/api/auth/callback",
+  "https://revolution-spaces-wy-construction.trycloudflare.com/auth/callback",
+  "https://revolution-spaces-wy-construction.trycloudflare.com/auth/shopify/callback",
+  "https://revolution-spaces-wy-construction.trycloudflare.com/api/auth/callback",
+  "https://janet-ban-papers-signed.trycloudflare.com/auth/callback",
+  "https://janet-ban-papers-signed.trycloudflare.com/auth/shopify/callback",
+  "https://janet-ban-papers-signed.trycloudflare.com/api/auth/callback",
+  "https://finger-basement-refugees-sixth.trycloudflare.com/auth/callback",
+  "https://finger-basement-refugees-sixth.trycloudflare.com/auth/shopify/callback",
+  "https://finger-basement-refugees-sixth.trycloudflare.com/api/auth/callback",
+  "https://usage-bother-assets-due.trycloudflare.com/auth/callback",
+  "https://usage-bother-assets-due.trycloudflare.com/auth/shopify/callback",
+  "https://usage-bother-assets-due.trycloudflare.com/api/auth/callback",
+  "https://mason-compare-human-software.trycloudflare.com/auth/callback",
+  "https://mason-compare-human-software.trycloudflare.com/auth/shopify/callback",
+  "https://mason-compare-human-software.trycloudflare.com/api/auth/callback",
+  "https://ip-baghdad-acute-bids.trycloudflare.com/auth/callback",
+  "https://ip-baghdad-acute-bids.trycloudflare.com/auth/shopify/callback",
+  "https://ip-baghdad-acute-bids.trycloudflare.com/api/auth/callback",
+  "https://lift-simpsons-sharp-delivery.trycloudflare.com/auth/callback",
+  "https://lift-simpsons-sharp-delivery.trycloudflare.com/auth/shopify/callback",
+  "https://lift-simpsons-sharp-delivery.trycloudflare.com/api/auth/callback",
+  "https://toe-satisfaction-resorts-maintained.trycloudflare.com/auth/callback",
+  "https://toe-satisfaction-resorts-maintained.trycloudflare.com/auth/shopify/callback",
+  "https://toe-satisfaction-resorts-maintained.trycloudflare.com/api/auth/callback"
+]
 
 [webhooks]
 api_version = "2024-10"

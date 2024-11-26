@@ -2,6 +2,7 @@ import "@shopify/shopify-app-remix/adapters/node";
 import {
   ApiVersion,
   AppDistribution,
+  DeliveryMethod,
   shopifyApp,
 } from "@shopify/shopify-app-remix/server";
 import { PrismaSessionStorage } from "@shopify/shopify-app-session-storage-prisma";
@@ -18,6 +19,28 @@ const shopify = shopifyApp({
   sessionStorage: new PrismaSessionStorage(prisma),
   distribution: AppDistribution.AppStore,
   restResources,
+  webhooks: {
+    COLLECTIONS_CREATE: {
+      deliveryMethod: DeliveryMethod.Http,
+      callbackUrl: "/webhooks/app/collection",
+    },
+    COLLECTIONS_UPDATE: {
+      deliveryMethod: DeliveryMethod.Http,
+      callbackUrl: "/webhooks/app/collection",
+    },
+    COLLECTIONS_DELETE: {
+      deliveryMethod: DeliveryMethod.Http,
+      callbackUrl: "/webhooks/app/collection",
+    },
+  },
+  hooks: {
+    afterAuth: async ({ session }) => {
+      // Register webhooks for the shop
+      // In this example, every shop will have these webhooks
+      // You could wrap this in some custom shop specific conditional logic if needed
+      shopify.registerWebhooks({ session });
+    },
+  },
   future: {
     unstable_newEmbeddedAuthStrategy: true,
   },

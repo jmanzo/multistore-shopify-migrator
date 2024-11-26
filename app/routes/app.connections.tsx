@@ -62,6 +62,12 @@ export default function Index() {
           content: 'Sync Menu',
           url: '/app/menu-sync',
         }]
+      }, {
+        title: 'Sync Catalogs',
+        actions: [{
+          content: 'Sync Catalogs',
+          url: '/app/catalog-sync',
+        }]
       }]}
     >
       <BlockStack gap="500">
