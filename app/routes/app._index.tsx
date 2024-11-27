@@ -1,6 +1,6 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { json, redirect } from "@remix-run/node";
+import { useLoaderData, useSubmit } from "@remix-run/react";
 import {
   Page,
   Layout,
@@ -8,11 +8,13 @@ import {
   BlockStack,
   EmptyState
 } from "@shopify/polaris";
-import { TitleBar } from "@shopify/app-bridge-react";
+import { TitleBar, useAppBridge } from "@shopify/app-bridge-react";
 
 import { authenticate } from "../shopify.server";
 import db from "../db.server";
 import { ConnectionsLayout } from "../components";
+import { createShopifyMenuFromConnection, getMenuFromConnection, getMenus, updateShopifyMenuFromConnection } from "app/helpers/shopify";
+import { NodeMenu } from "app/types";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { session } = await authenticate.admin(request);
@@ -26,8 +28,41 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
    return json({ connections });
 };
 
+export async function action({ request, params }: ActionFunctionArgs) {
+  const {admin} = await authenticate.admin(request);
+
+  try {
+    const data = await getMenus(admin);
+    const menus = data?.data?.menus?.edges || [];
+    const connectedStores = await db.connection.findMany();
+
+    if (menus.length > 0) {
+      for (const store of connectedStores) {
+        for (const menu of menus) {
+          const connectedMenu = await getMenuFromConnection(store, menu);
+          const menuFromConnection = connectedMenu?.data?.menus?.edges.find(
+            (edge: NodeMenu) => edge.node.handle === menu.node.handle
+          )?.node || null;
+
+          if (menuFromConnection) {
+            await updateShopifyMenuFromConnection(store, menuFromConnection.id, menu);
+          } else {
+            await createShopifyMenuFromConnection(store, menu);
+          }
+        }
+      }
+    }
+  } catch (error) {
+    console.error('x Error syncing menus: ', error);
+  }
+
+  return redirect("/app");
+}
+
 export default function Index() {
   const { connections } = useLoaderData<typeof loader>() || {};
+  const shopify = useAppBridge();
+  const submit = useSubmit();
 
   const EmptyStateExample = () => {
     return (
@@ -60,8 +95,11 @@ export default function Index() {
         title: 'Actions',
         actions: [{
           content: 'Sync Menu',
-          url: '/app/menu-sync',
-        }]
+          onAction: async () => {
+            shopify.toast.show('Syncing Menus');
+            submit(null, { method: "post" });
+          }
+        }],
       }]}
     >
       <BlockStack gap="500">
