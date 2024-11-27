@@ -1,6 +1,6 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-client_id = "e91f881d7a3e44b9c705661c7aca9284"
+client_id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 name = "Multistore Migrator"
 handle = "multistore-migrator-app"
 application_url = "https://example.com"
@@ -8,7 +8,7 @@ embedded = true
 
 [build]
 automatically_update_urls_on_dev = true
-dev_store_url = "duilo-migration-app.myshopify.com"
+dev_store_url = "example.myshopify.com"
 include_config_on_deploy = true
 
 [access_scopes]
