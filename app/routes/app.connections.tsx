@@ -28,8 +28,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 };
 
 export async function action({ request, params }: ActionFunctionArgs) {
-  const { admin } = await authenticate.admin(request);
-  await syncMenus(admin);
+  const { admin, session } = await authenticate.admin(request);
+  await syncMenus(session.shop, admin);
   return redirect("/app/connections");
 }
 
