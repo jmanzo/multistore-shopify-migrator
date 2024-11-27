@@ -1,9 +1,10 @@
 // TODO: Optimize the query and mutation operations.
 
 import type { AdminApiContext } from "@shopify/shopify-app-remix/server";
-import type { Connection } from "../server/collections";
+import type { Connection } from "../server/collection.server";
 import { CollectionPayload } from "../types/shopify/collections";
 import { MetafieldDefinition, MetafieldsByDefinitionResponse, Type, Validation } from "../types/shopify/metafields";
+import { NodeMenu } from "app/types";
 
 export const updateShopifyCollection = async (
   admin: AdminApiContext, 
@@ -458,5 +459,235 @@ const updateShopifyCollectionFromConnection = async (
     console.warn('! userErrors: ', data?.data?.collectionUpdate?.userErrors);
   } catch (error) {
     console.error("x Error updating collection in connection: ", error);
+  }
+}
+
+export const updateShopifyMenuFromConnection = async (
+  connection: Connection,
+  menuId: string,
+  payload: NodeMenu
+) => {
+  try {
+    const storeMenuItems = payload.node.items?.map(item => ({
+      title: item.title,
+      type: "HTTP", // TODO: This will need to be dynamic eventually.
+      url: item.url,
+      tags: item?.tags,
+      items: item?.items?.map(subItem => ({
+        title: subItem.title,
+        type: "HTTP",
+        url: subItem.url,
+        tags: subItem?.tags,
+        items: subItem?.items?.map(subSubItem => ({
+          title: subSubItem.title,
+          type: "HTTP",
+          url: subSubItem.url,
+          tags: subSubItem?.tags,
+        })),
+      })),
+    }));
+
+    const operation = `
+      #graphql
+      mutation UpdateMenu($id: ID!, $title: String!, $handle: String!, $items: [MenuItemUpdateInput!]!) {
+        menuUpdate(id: $id, title: $title, handle: $handle, items: $items) {
+          menu {
+            id
+            handle
+            items {
+              id
+              title
+              items {
+                id
+                title
+              }
+            }
+          }
+        }
+      }
+    `;
+
+    const response = await fetch(
+      connection.url + '/admin/api/2024-10/graphql.json', 
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Shopify-Access-Token': connection.accessToken,
+        },
+        body: JSON.stringify({
+          query: operation,
+          variables: {
+            id: menuId,
+            title: payload.node.title,
+            handle: payload.node.handle,
+            items: storeMenuItems,
+          },
+        }),
+      }
+    );
+
+    return await response.json();
+  } catch (error) {
+    console.error("x Error updating menu in connection: ", error);
+  }
+}
+
+export const createShopifyMenuFromConnection = async (
+  connection: Connection,
+  payload: NodeMenu
+) => {
+  try {
+    const storeMenuItems = payload.node.items?.map(item => ({
+      title: item.title,
+      type: "HTTP", // TODO: This will need to be dynamic eventually.
+      url: item.url,
+      tags: item?.tags,
+      items: item?.items?.map(subItem => ({
+        title: subItem.title,
+        type: "HTTP",
+        url: subItem.url,
+        tags: subItem?.tags,
+        items: subItem?.items?.map(subSubItem => ({
+          title: subSubItem.title,
+          type: "HTTP",
+          url: subSubItem.url,
+          tags: subSubItem?.tags,
+        })),
+      })),
+    }));
+
+    const operation = `
+      #graphql
+      mutation CreateMenu($title: String!, $handle: String!, $items: [MenuItemCreateInput!]!) {
+        menuCreate(title: $title, handle: $handle, items: $items) {
+            menu {
+                id
+                handle
+                items {
+                    id
+                    title
+                    items {
+                        id
+                        title
+                    }
+                }
+            }
+            userErrors {
+                field
+                message
+            }
+        }
+    }
+    `;
+
+    const response = await fetch(
+      connection.url + '/admin/api/2024-10/graphql.json', 
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Shopify-Access-Token': connection.accessToken,
+        },
+        body: JSON.stringify({
+          query: operation,
+          variables: {
+            title: payload.node.title,
+            handle: payload.node.handle,
+            items: storeMenuItems,
+          },
+        }),
+      }
+    );
+
+    return await response.json();
+  } catch (error) {
+    console.error("x Error updating menu in connection: ", error);
+  }
+}
+
+export const getMenuFromConnection = async (connection: Connection, menu: NodeMenu) => {
+  try {
+    const operation = `
+      #graphql
+      query {
+        menus(first: 100, query: "title:${menu.node.title}") {
+          edges {
+            node {
+              id
+              handle
+              title
+            }
+          }
+        }
+      }
+    `;
+    const response = await fetch(
+      connection.url + '/admin/api/2024-10/graphql.json', 
+      {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Shopify-Access-Token': connection.accessToken,
+          },
+          body: JSON.stringify({
+            query: operation
+          }),
+      }
+    );
+    
+    return await response.json();
+  } catch (error) {
+    console.error("x Error getting collection from connection: ", error);
+    return null;
+  }
+};
+
+export const getMenus = async (admin: AdminApiContext) => {
+  try {
+    // Fetch Navigation
+    const response = await admin.graphql(`
+      #graphql
+      query {
+        menus(first: 100) {
+          edges {
+            node {
+              id
+              handle
+              title
+              items {
+                ... on MenuItem {
+                  tags
+                  title
+                  type
+                  url
+                  items {
+                    ... on MenuItem {
+                      tags
+                      title
+                      type
+                      url
+                      items {
+                        ... on MenuItem {
+                          tags
+                          title
+                          type
+                          url
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }`, {}
+    );
+
+    return await response.json();
+  } catch (error) {
+    console.error("x Error getting menus: ", error);
+    return null;
   }
 }
