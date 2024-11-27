@@ -1,7 +1,7 @@
 // TODO: Optimize the query and mutation operations.
 
 import type { AdminApiContext } from "@shopify/shopify-app-remix/server";
-import type { Connection } from "../server/collections";
+import type { Connection } from "../server/collection.server";
 import { CollectionPayload } from "../types/shopify/collections";
 import { MetafieldDefinition, MetafieldsByDefinitionResponse, Type, Validation } from "../types/shopify/metafields";
 import { NodeMenu } from "app/types";

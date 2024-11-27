@@ -3,7 +3,7 @@ import type { AdminApiContext } from "@shopify/shopify-app-remix/server";
 
 import { authenticate } from "../shopify.server";
 import { CollectionPayload } from "../types/shopify/collections";
-import { updateCollection } from "../server/collections";
+import { updateCollection } from "../server/collection.server";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { shop, topic, payload, admin } = await authenticate.webhook(request);

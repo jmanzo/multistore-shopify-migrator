@@ -13,8 +13,7 @@ import { TitleBar, useAppBridge } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 import db from "../db.server";
 import { ConnectionsLayout } from "../components";
-import { createShopifyMenuFromConnection, getMenuFromConnection, getMenus, updateShopifyMenuFromConnection } from "app/helpers/shopify";
-import { NodeMenu } from "app/types";
+import { syncMenus } from "app/server/navigation.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { session } = await authenticate.admin(request);
@@ -30,32 +29,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
 export async function action({ request, params }: ActionFunctionArgs) {
   const {admin} = await authenticate.admin(request);
-
-  try {
-    const data = await getMenus(admin);
-    const menus = data?.data?.menus?.edges || [];
-    const connectedStores = await db.connection.findMany();
-
-    if (menus.length > 0) {
-      for (const store of connectedStores) {
-        for (const menu of menus) {
-          const connectedMenu = await getMenuFromConnection(store, menu);
-          const menuFromConnection = connectedMenu?.data?.menus?.edges.find(
-            (edge: NodeMenu) => edge.node.handle === menu.node.handle
-          )?.node || null;
-
-          if (menuFromConnection) {
-            await updateShopifyMenuFromConnection(store, menuFromConnection.id, menu);
-          } else {
-            await createShopifyMenuFromConnection(store, menu);
-          }
-        }
-      }
-    }
-  } catch (error) {
-    console.error('x Error syncing menus: ', error);
-  }
-
+  await syncMenus(admin);
   return redirect("/app");
 }
 
